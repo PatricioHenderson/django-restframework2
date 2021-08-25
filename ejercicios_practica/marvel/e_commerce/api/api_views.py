@@ -1,4 +1,5 @@
 # Primero, importamos los serializadores
+from django.db.models.query import QuerySet
 from e_commerce.api.serializers import *
 
 # Segundo, importamos los modelos:
@@ -189,4 +190,88 @@ class LoginUserAPIView(APIView):
             return Response(user_data)
 
 # TODO: Agregar las vistas genericas que permitan realizar un CRUD del modelo de wish-list.
+class GetWishListAPIView(ListAPIView):
+    __doc__ = f'''{mensaje_headder}
+    [METODO GET]
+    Esta vista de API nos devuelve una lista de todos los comics en wish list
+    presentes en la base de datos 
+    En este caso no hace falta que sea admin para poder ver esta información
+
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permision_classes = [IsAuthenticated]
+
+class PostWishListAPIView(CreateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    [METODO POST]
+    Esta vista de API nos devuelve una lista de todos los comics en wish list
+    presentes en la base de datos
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permision_classes = [IsAuthenticated , IsAdminUser]
+
+class ListCreateWishListAPIView(ListCreateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET-POST]`
+    Esta vista de API nos devuelve una lista de todos los comics presentes 
+    en la base de datos.
+    Tambien nos permite hacer un insert en la base de datos.
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permision_classes = [IsAuthenticated , IsAdminUser]
+
+class RetrieveUpdateWishListAPIView(RetrieveUpdateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET-POST]`
+    Actualizar o solo visualizar un registro
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permision_classes = [IsAuthenticated , IsAdminUser]
+
+class DestroyWishListAPIView(DestroyAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET-POST]`
+    eliminar un registro
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permision_classes = [IsAuthenticated , IsAdminUser]
+
+
+class GetUserFavsAPIView(ListAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET]`
+    Esta vista de API nos devuelve comics favoritos de un usuario particular.
+    '''
+    serializer_class = WishListSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get_queryset(self):
+        '''
+        Sobrescribimos la función `get_queryset` para poder filtrar el request 
+        por medio de la url. En este caso traemos de la url por medio de `self.kwargs` 
+        el parámetro `comic_id` y con él realizamos una query para traer 
+        el comic del ID solicitado.  
+        '''
+        try:
+            username = self.kwargs['username']
+            user = User.objects.filter(username=username)
+            wish_list = WishList.objects.filter(user_id=user.first(), favorite=True)
+            comic = []
+            for i in wish_list:
+                comic_obj = Comic.objects.filter(id=wish_list.comic_id).first()
+                comic.append(i)
+            return comic
+              
+            
+            
+        except Exception as error:
+            return {'error': f'Ha ocurrido la siguiente excepción: {error}'}
+
+
+
 # TODO: Crear una vista generica modificada para traer todos los comics que tiene un usuario.

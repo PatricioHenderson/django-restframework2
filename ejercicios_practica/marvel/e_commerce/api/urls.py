@@ -21,5 +21,12 @@ urlpatterns = [
     path('comics/<pk>/delete', DestroyComicAPIView.as_view()),
 
     # TODO: Wish-list API View
+    # WishList API View
+    path('wishlist/get', GetWishListAPIView.as_view()),
+    path('wishsist/post', PostWishListAPIView.as_view()),
+    path('wishlist/get-post' , ListCreateWishListAPIView.as_view()),
+    path('wishlist/<pk>/update', RetrieveUpdateWishListAPIView.as_view()),
+    path('wishlist/<pk>/delete', DestroyWishListAPIView.as_view()),
+    path('wishlist/<username>/get', GetUserFavsAPIView.as_view()),
 
 ]

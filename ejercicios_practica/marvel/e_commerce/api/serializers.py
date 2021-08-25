@@ -24,3 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields= ("__all__")
 
 # TODO: Realizar el serializador para el modelo de WishList
+
+class WishListSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(write_only=True,
+                queryset=User.objects.all())
+    
+    comic_id = serializers.PrimaryKeyRelatedField(write_only=True,
+                queryset=Comic.objects.all())            
+    
+    class Meta:
+        model = WishList
+        fields= ("__all__")
